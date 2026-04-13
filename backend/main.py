@@ -17,7 +17,7 @@ AWS_REGION = os.getenv("AWS_REGION")
 
 BUCKET = os.getenv("S3_BUCKET")
 FILE_KEY = os.getenv("S3_FILE_KEY")
-BATCH_SIZE = int(os.getenv("BATCH_SIZE", 10))
+BATCH_SIZE = int(os.getenv("BATCH_SIZE", 100))
 s3 = boto3.client(
     "s3",
     aws_access_key_id=AWS_ACCESS_KEY,
@@ -25,11 +25,45 @@ s3 = boto3.client(
     region_name=AWS_REGION
 )
 
+def list_all_files():
+    files = []
+    continuation_token = None
 
+    while True:
+        if continuation_token:
+            response = s3.list_objects_v2(
+                Bucket=BUCKET,
+                Prefix=FILE_KEY,
+                ContinuationToken=continuation_token
+            )
+        else:
+            response = s3.list_objects_v2(
+                Bucket=BUCKET,
+                Prefix=FILE_KEY
+            )
+
+        for obj in response.get("Contents", []):
+            files.append(obj["Key"])
+
+        # check if more files exist
+        if response.get("IsTruncated"):
+            continuation_token = response.get("NextContinuationToken")
+        else:
+            break
+
+    return files   
 
 def load_data():
-    obj = s3.get_object(Bucket=BUCKET, Key=FILE_KEY)
-    return pd.read_csv(io.BytesIO(obj['Body'].read()))
+    files = list_all_files()
+    
+    df_list = []
+    
+    for file_key in files:
+        obj = s3.get_object(Bucket=BUCKET, Key=file_key)
+        df = pd.read_csv(io.BytesIO(obj['Body'].read()))
+        df_list.append(df)
+    
+    return pd.concat(df_list, ignore_index=True)
 
 df = load_data()
 
