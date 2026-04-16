@@ -3,8 +3,8 @@ import os
 API_URL = os.getenv("API_URL")
 
 S3_BUCKET = os.getenv("S3_BUCKET")
-RAW_PREFIX = "MarketingAnalytics_Team2_AWS/raw/"
+RAW_PREFIX = "raw/"
 
-OFFSET_KEY = "MarketingAnalytics_Team2_AWS/metadata/offset.json"
+OFFSET_KEY = "metadata/offset.json"
 
-BATCH_SIZE = 100
+BATCH_SIZE = 1000

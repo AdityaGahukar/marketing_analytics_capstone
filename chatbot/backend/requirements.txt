@@ -1,0 +1,6 @@
+
+databricks-sql-connector
+dotenv
+uvicorn   
+google-generativeai
+sqlparse
