@@ -9,8 +9,8 @@ import os
 # ============================================================
 # CONFIGURATION — Change these for each batch run
 # ============================================================
-STUDENT = "abhinav"
-PROJECT = "safecity360"
+STUDENT = "team2"
+PROJECT = "marketing_analytics"
 BATCH_ID = "batch_01"  # Change this: batch_02, batch_03, batch_04, batch_05
 
 # Databricks notebook paths (update with your workspace path)
@@ -77,7 +77,7 @@ default_args = {
 with DAG(
     dag_id="arnav_test_pipeline",
     default_args=default_args,
-    description="SafeCity 360 end-to-end DE pipeline",
+    description="marketing_analytics end-to-end DE pipeline",
     schedule=None,
     start_date=datetime(2025, 1, 1),
     catchup=False,
