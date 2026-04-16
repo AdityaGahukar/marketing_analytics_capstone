@@ -75,7 +75,7 @@ default_args = {
 # DAG DEFINITION
 # ============================================================
 with DAG(
-    dag_id="arnav_test_pipeline",
+    dag_id="arnav_test_dag2",
     default_args=default_args,
     description="marketing_analytics end-to-end DE pipeline",
     schedule=None,
