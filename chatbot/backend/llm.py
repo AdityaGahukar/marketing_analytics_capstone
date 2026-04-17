@@ -1,32 +1,80 @@
-import google.generativeai as genai
+from google import genai   # ✅ NEW SDK
 import os
+import re
 from dotenv import load_dotenv
-from data_dict import DATA_DICTIONARY
 
+# 🔐 Load env
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
+# 🔑 Configure client
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
-def generate_sql(user_input):
-
-    prompt = f"""
-    {DATA_DICTIONARY}
-
-    Convert the user question into SQL query.
-
-    Strict Rules:
-    - Only SELECT queries allowed
-    - No DELETE, UPDATE, INSERT
-    - No joins
-    - No subqueries
-    - Must include LIMIT 100
-    - Return ONLY SQL (no explanation)
-
-    User Question: {user_input}
+def clean_sql(response_text: str) -> str:
+    """
+    Clean Gemini output to extract pure SQL
     """
 
-    response = model.generate_content(prompt)
+    if not response_text:
+        return None
 
-    return response.text.strip()
+    text = response_text.strip()
+
+    # Remove markdown ```sql ```
+    text = re.sub(r"```sql", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"```", "", text)
+
+    # Extract SELECT query
+    match = re.search(r"(SELECT .*?LIMIT \d+)", text, re.IGNORECASE | re.DOTALL)
+
+    if match:
+        return match.group(1).strip()
+
+    return text
+
+
+def generate_sql(user_input: str) -> str:
+    """
+    Convert natural language → SQL using Gemini
+    """
+
+    prompt = f"""
+    You are an expert SQL generator.
+
+    Convert the user question into a SQL query.
+
+    STRICT RULES:
+    - Only SELECT queries allowed
+    - No DELETE, UPDATE, INSERT, DROP
+    - No joins
+    - No subqueries
+    - Avoid SELECT *
+    - Always include LIMIT 100
+    - Prefer aggregation (SUM, COUNT) when possible
+    - Return ONLY SQL query
+    - Do NOT include explanation
+    - Do NOT include markdown
+
+    User Question:
+    {user_input}
+    """
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",   # ✅ correct model usage
+            contents=prompt
+        )
+
+        raw_text = response.text
+
+        sql_query = clean_sql(raw_text)
+
+        # 🔴 Fallback
+        if not sql_query or "SELECT" not in sql_query.upper():
+            return None
+
+        return sql_query
+
+    except Exception as e:
+        print("LLM Error:", str(e))
+        return None

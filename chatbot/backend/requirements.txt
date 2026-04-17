@@ -1,6 +1,9 @@
-
+fastapi
+uvicorn
 databricks-sql-connector
-dotenv
-uvicorn   
+python-dotenv  
 google-generativeai
 sqlparse
+pyarrow
+openai
+mistralai
