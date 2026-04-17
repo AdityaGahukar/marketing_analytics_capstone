@@ -131,7 +131,7 @@ with DAG(
     
 
 #   TASK 3.   Run silver Data quality checks
-    run_silver = DatabricksSubmitRunOperator(
+    run_silver_dq = DatabricksSubmitRunOperator(
     task_id="run_silver_data_quality",
     databricks_conn_id="databricks_default",
     json={
@@ -220,3 +220,6 @@ with DAG(
 
 #     # PIPELINE ORDER (7 tasks)
 #     upload_csv_to_s3 >> run_bronze >> run_silver >> run_gold >> run_dq >> export_gold_to_s3 >> refresh_snowflake
+
+
+run_bronze >> run_silver >> run_silver_dq

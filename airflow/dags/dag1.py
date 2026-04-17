@@ -54,7 +54,8 @@ default_args = {
 with DAG(
     dag_id="api_to_s3_incremental",
     start_date=datetime(2024, 1, 1),
-    schedule="*/15 * * * *",  # every 15 mins
+    # schedule="*/15 * * * *",  # every 15 mins
+    schedule=None,
     catchup=False,
     default_args=default_args,
     tags=["api", "s3", "incremental"]
