@@ -80,6 +80,7 @@ def chat(request: ChatRequest):
 
     
     try:
+        print('started')
         data = run_query(sql_query)
     except Exception as e:
         return {
