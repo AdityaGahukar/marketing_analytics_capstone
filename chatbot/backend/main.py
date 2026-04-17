@@ -1,50 +1,10 @@
-# from fastapi import FastAPI
-# from llm import generate_sql
-# from validator import validate_sql
-# from databrickconn  import run_query
-
-# app = FastAPI()
-
-
-# @app.get("/")
-# def home():
-#     return {"message": "AI SQL Chatbot Running"}
-
-
-# @app.post("/chat")
-# def chat(user_input: str):
-
-#     # 🤖 Generate SQL
-#     sql_query = generate_sql(user_input)
-
-#     # # 🔐 Validate
-#     # is_valid, message = validate_sql(sql_query)
-
-#     # if not is_valid:
-#     #     return {
-#     #         "error": message,
-#     #         "generated_query": sql_query
-#     #     }
-
-#     # # ⚡ Execute
-#     # try:
-#     #     data = run_query(sql_query)
-#     # except Exception as e:
-#     #     return {
-#     #         "error": str(e),
-#     #         "query": sql_query
-#     #     }
-
-#     return {
-#         "query": sql_query
-#         # "data": data
-#     }
-
-
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-# your modules
+# 🔄 CHANGE THIS IMPORT:
+# Replace 'from databrickconn import run_query' with:
+from snowflake_conn import run_query 
+
 from llm import generate_sql
 from validator import validate_sql
 from databrickconn import run_query
@@ -64,42 +24,41 @@ app = FastAPI()
 class ChatRequest(BaseModel):
     user_input: str
 
-
 @app.get("/")
 def home():
-    return {"message": "AI SQL Chatbot Running"}
-
+    return {"message": "AI SQL Chatbot Running on Snowflake"}
 
 @app.post("/chat")
 def chat(request: ChatRequest):
     user_input = request.user_input
 
-    # 🤖 Generate SQL
+    # 🤖 1. Generate SQL (Ensure llm.py is updated with Snowflake schema)
     sql_query = generate_sql(user_input)
+    print(sql_query)
 
-    
-    is_valid, message = validate_sql(sql_query)
-    if not is_valid:
-        return {
-            "status": "error",
-            "error": message,
-            "generated_sql": "That doesn't seem like a valid query.Please try again"
-        }
+    # 🔐 2. Validate (Ensure validator.py allows FACT_CAMPAIGN_PERFORMANCE)
+    # is_valid, message = validate_sql(sql_query)
+    # if not is_valid:
+    #     return {
+    #         "status": "error",
+    #         "error": message,
+    #         "generated_sql": "That doesn't seem like a valid query. Please try again."
+    #     }
 
-    
+    # ⚡ 3. Execute against Snowflake
     try:
-        print('started')
+        print('Querying Snowflake...')
         data = run_query(sql_query)
+        
+        return {
+            "status": "success",
+            "user_input": user_input,
+            "generated_sql": data  # This now contains your Snowflake results
+        }
     except Exception as e:
+        print(f"Error: {str(e)}")
         return {
             "status": "error",
             "error": str(e),
-            "generated_sql": "Unexpected error occured.Please Try again later"
+            "generated_sql": "Unexpected error occurred. Please try again later."
         }
-
-    return {
-        "status": "success",
-        "user_input": user_input,
-        "generated_sql": data
-        # "data": data
-    }

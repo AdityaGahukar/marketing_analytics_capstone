@@ -1,10 +1,11 @@
 import streamlit as st
 import requests
+import pandas as pd # <-- Added for beautiful data handling
 
 # ─────────────────────────────────────────────
 #  CONFIG
 # ─────────────────────────────────────────────
-API_URL = "http://127.0.0.1:8001/chat"
+API_URL = "http://127.0.0.1:8000/chat"
 
 # ─────────────────────────────────────────────
 #  PAGE CONFIG
@@ -31,18 +32,22 @@ for key, default in [
 # ─────────────────────────────────────────────
 #  HELPER – call backend API
 # ─────────────────────────────────────────────
-def call_api(query: str) -> tuple[str, bool]:
+def call_api(query: str) -> tuple[any, bool]:
     try:
         resp = requests.post(API_URL, json={"user_input": query}, timeout=30)
         resp.raise_for_status()
         data = resp.json()
+        
+        # Keep the raw data structure if it's a list/dict so we can chart it later
         if isinstance(data, dict):
-            reply = data.get("generated_sql") or data.get("query") or data.get("answer") or str(data)
+            # Extract the actual payload regardless of the key name
+            reply = data.get("generated_sql") or data.get("query") or data.get("answer") or data
         else:
-            reply = str(data)
+            reply = data
+            
         return reply, False
-    except Exception:
-        return "Something went wrong. Please try again.", True
+    except Exception as e:
+        return f"Something went wrong: {str(e)}", True
 
 # ─────────────────────────────────────────────
 #  GLOBAL CSS
@@ -161,9 +166,6 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
 
 /* ══════════════════════════
    INPUT SECTION
-   Streamlit columns sit inside the glass card.
-   We target the column wrappers directly so the
-   input + button stay on one flex row.
 ══════════════════════════ */
 .input-outer {
     margin: 2.2rem 0 0.5rem;
@@ -177,13 +179,10 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     padding: 6px 6px 6px 16px;
-    /* make the internal Streamlit columns form a flex row */
     display: flex;
     align-items: center;
 }
 
-/* Streamlit injects a div[data-testid="column"] per column.
-   Make the text-input column grow and button column shrink. */
 .input-outer [data-testid="column"]:first-child {
     flex: 1 1 auto !important;
     min-width: 0 !important;
@@ -194,7 +193,6 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
     width: auto !important;
 }
 
-/* Strip all Streamlit input chrome */
 .input-outer [data-testid="stTextInput"] > div,
 .input-outer [data-testid="stTextInput"] > div > div {
     background: transparent !important;
@@ -219,7 +217,6 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
     font-size: 0.95rem !important;
 }
 
-/* Generate button */
 .input-outer [data-testid="stBaseButton-secondary"],
 .input-outer .stButton > button {
     background: linear-gradient(135deg, #CBD5E1 0%, #B0C4D8 100%) !important;
@@ -243,19 +240,13 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
     box-shadow: 0 4px 16px rgba(37,99,235,0.28) !important;
     transform: translateY(-1px) !important;
 }
-.input-outer [data-testid="stBaseButton-secondary"]:disabled,
-.input-outer .stButton > button:disabled {
-    opacity: 0.48 !important;
-    cursor: default !important;
-    transform: none !important;
-}
 
 /* ══════════════════════════
    RESPONSE BUBBLES
 ══════════════════════════ */
 .response-area {
     margin-top: 1.6rem;
-    padding-bottom: 3rem;
+    padding-bottom: 1rem;
 }
 
 .bubble-user-row {
@@ -331,24 +322,6 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {
 }
 .footer-links { display: flex; gap: 1.6rem; }
 
-/* ══════════════════════════
-   RESPONSIVE
-══════════════════════════ */
-@media (max-width: 600px) {
-    .insyte-nav    { padding: 0.8rem 1rem; }
-    .nav-links     { display: none; }
-    .page-wrap     { padding: 0 0.9rem; }
-    .hero          { padding: 3rem 0 2rem; }
-    .bubble-user,
-    .bubble-bot    { max-width: 88%; }
-    .insyte-footer {
-        flex-direction: column;
-        gap: 0.6rem;
-        text-align: center;
-        padding: 1rem;
-    }
-    .footer-links  { gap: 1rem; }
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -386,10 +359,6 @@ st.markdown("""
 
 # ─────────────────────────────────────────────
 #  INPUT CARD
-#  The .input-outer div is opened, then Streamlit
-#  columns are rendered inside it — CSS flex rules
-#  override the column widths to keep everything
-#  on one row regardless of screen size.
 # ─────────────────────────────────────────────
 st.markdown('<div class="input-outer">', unsafe_allow_html=True)
 col_inp, col_btn = st.columns([6, 1], gap="small")
@@ -409,12 +378,32 @@ with col_btn:
     )
 st.markdown('</div>', unsafe_allow_html=True)
 
+# A dedicated container just for the loader so it appears exactly where we want it!
+loader_placeholder = st.empty()
+
+# ─────────────────────────────────────────────
+#  ON SEND (Placing this before response area to trigger loader first)
+# ─────────────────────────────────────────────
+if send_clicked and user_input and user_input.strip():
+    st.session_state.user_msg = user_input.strip()
+    
+    # ── THE LOADER ──
+    with loader_placeholder.container():
+        with st.spinner("🧠 Querying database and generating insights..."):
+            reply, is_error = call_api(user_input.strip())
+            
+    st.session_state.bot_msg = reply
+    st.session_state.is_error = is_error
+    st.session_state.has_response = True
+    st.rerun()
+
 # ─────────────────────────────────────────────
 #  RESPONSE AREA
 # ─────────────────────────────────────────────
 if st.session_state.has_response:
     st.markdown('<div class="response-area">', unsafe_allow_html=True)
 
+    # 1. User Message
     st.markdown(
         f'<div class="bubble-user-row">'
         f'<div class="bubble-user">{st.session_state.user_msg}</div>'
@@ -424,15 +413,59 @@ if st.session_state.has_response:
 
     err_cls = " bubble-error" if st.session_state.is_error else ""
     icon = "⚠" if st.session_state.is_error else "📊"
-    st.markdown(
-        f'<div class="bubble-bot-row">'
-        f'<div class="bot-avatar">{icon}</div>'
-        f'<div class="bubble-bot{err_cls}">{st.session_state.bot_msg}</div>'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
+    bot_reply = st.session_state.bot_msg
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    # 2. Dynamic Bot Response Parsing
+    # Check if the backend gave us a LIST OF DICTIONARIES (Tabular Data)
+    if isinstance(bot_reply, list) and len(bot_reply) > 0 and isinstance(bot_reply[0], dict):
+        
+        # Display introductory text bubble
+        st.markdown(
+            f'<div class="bubble-bot-row">'
+            f'<div class="bot-avatar">{icon}</div>'
+            f'<div class="bubble-bot{err_cls}">Here are the insights you requested based on the data:</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True) # Close response-area so we can use native Streamlit components
+        
+        # Convert the JSON array to a Pandas DataFrame
+        df = pd.DataFrame(bot_reply)
+        
+        # Create a container with a white background for the charts/data
+        with st.container():
+            st.write("### 📈 Visual Trends")
+            
+            # --- Auto-Charting Logic ---
+            # Try to find a string/date column to use as the X-axis for better looking charts.
+            # E.g., if there's a "MONTH" column, the chart will automatically group by it!
+            df_chart = df.copy()
+            string_cols = df_chart.select_dtypes(include=['object', 'string']).columns
+            if len(string_cols) > 0:
+                df_chart.set_index(string_cols[0], inplace=True)
+            
+            # Render a beautiful native line chart or bar chart
+            try:
+                st.line_chart(df_chart, use_container_width=True)
+            except:
+                # Fallback if line chart fails on certain text data
+                st.bar_chart(df_chart, use_container_width=True)
+            
+            st.write("### 📋 Raw Data")
+            # Render an interactive, scrollable data table
+            st.dataframe(df, use_container_width=True, hide_index=True)
+            
+    else:
+        # If it's standard text, string, or a simple JSON dictionary, render as a regular text bubble
+        display_text = str(bot_reply)
+        st.markdown(
+            f'<div class="bubble-bot-row">'
+            f'<div class="bot-avatar">{icon}</div>'
+            f'<div class="bubble-bot{err_cls}">{display_text}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('</div>', unsafe_allow_html=True) # Close response-area
 
 # ─────────────────────────────────────────────
 #  PAGE WRAPPER CLOSE
@@ -452,15 +485,3 @@ st.markdown("""
   </div>
 </div>
 """, unsafe_allow_html=True)
-
-# ─────────────────────────────────────────────
-#  ON SEND
-# ─────────────────────────────────────────────
-if send_clicked and user_input and user_input.strip():
-    st.session_state.user_msg = user_input.strip()
-    with st.spinner("Analyzing your query…"):
-        reply, is_error = call_api(user_input.strip())
-    st.session_state.bot_msg = reply
-    st.session_state.is_error = is_error
-    st.session_state.has_response = True
-    st.rerun()

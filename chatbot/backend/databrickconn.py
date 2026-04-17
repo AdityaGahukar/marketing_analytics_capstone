@@ -9,7 +9,7 @@ load_dotenv()
 #         access_token=os.getenv("DATABRICKS_TOKEN")
 #     )
 
-def run_query(query):
+_conn = None
 
     # conn = sql.connect(
     #     server_hostname=os.getenv("DATABRICKS_HOST"),
@@ -17,15 +17,23 @@ def run_query(query):
     #     access_token=os.getenv("DATABRICKS_TOKEN")
     # )
 
-    conn=get_connection()
+conn=get_connection()
 
+def run_query(query):
+    conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute(query)
-
-    columns = [col[0] for col in cursor.description]
-    rows = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
-    return [dict(zip(columns, row)) for row in rows]
+    
+    try:
+        cursor.execute(query)
+        
+        # 🔥 Fetch data as an Arrow table (much faster than fetchall)
+        arrow_table = cursor.fetchall_arrow()
+        
+        if arrow_table is None:
+            return []
+            
+        # 🔥 Convert the Arrow table directly to a list of dictionaries
+        return arrow_table.to_pylist()
+        
+    finally:
+        cursor.close()
