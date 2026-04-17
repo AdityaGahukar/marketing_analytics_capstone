@@ -1,16 +1,23 @@
 from databricks import sql
 import os
 from dotenv import load_dotenv
-
+from globalconn import get_connection
 load_dotenv()
+# conn = sql.connect(
+#         server_hostname=os.getenv("DATABRICKS_HOST"),
+#         http_path=os.getenv("DATABRICKS_HTTP_PATH"),
+#         access_token=os.getenv("DATABRICKS_TOKEN")
+#     )
 
 def run_query(query):
 
-    conn = sql.connect(
-        server_hostname=os.getenv("DATABRICKS_HOST"),
-        http_path=os.getenv("DATABRICKS_HTTP_PATH"),
-        access_token=os.getenv("DATABRICKS_TOKEN")
-    )
+    # conn = sql.connect(
+    #     server_hostname=os.getenv("DATABRICKS_HOST"),
+    #     http_path=os.getenv("DATABRICKS_HTTP_PATH"),
+    #     access_token=os.getenv("DATABRICKS_TOKEN")
+    # )
+
+    conn=get_connection()
 
     cursor = conn.cursor()
     cursor.execute(query)
