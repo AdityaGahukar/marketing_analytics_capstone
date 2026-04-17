@@ -122,7 +122,7 @@ with DAG(
             {
                 "task_key": "silver_task",
                 "notebook_task": {
-                    "notebook_path": "/Workspace/Users/202251023@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/silver_layer"
+                    "notebook_path": "/Workspace/Users/aditya.sah@sigmoidanalytics.com/marketing_analytics_capstone/notebooks/silver_layer"
                 }
             }
         ]
@@ -139,7 +139,7 @@ with DAG(
             {
                 "task_key": "silver_task",
                 "notebook_task": {
-                    "notebook_path": "/Workspace/Users/202251023@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/Silver_dataquality_version2"
+                    "notebook_path": "/Workspace/Users/aditya.sah@sigmoidanalytics.com/marketing_analytics_capstone/notebooks/Silver_dataquality_version2"
                 }
             }
         ]
