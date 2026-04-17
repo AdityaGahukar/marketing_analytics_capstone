@@ -75,7 +75,7 @@ default_args = {
 # DAG DEFINITION
 # ============================================================
 with DAG(
-    dag_id="arnav_test_dag2",
+    dag_id="run_etl_pipeline",
     default_args=default_args,
     description="marketing_analytics end-to-end DE pipeline",
     schedule=None,
@@ -91,7 +91,7 @@ with DAG(
     #     op_kwargs={"batch_id": BATCH_ID, "bucket": BUCKET, "project": PROJECT},
     # )
 
-    # TASK 2: Bronze
+    # TASK 1: Bronze
     run_bronze = DatabricksSubmitRunOperator(
     task_id="run_bronze",
     databricks_conn_id="databricks_default",
@@ -110,41 +110,43 @@ with DAG(
     }
 )
     
-    # upload_csv_to_s3 = PythonOperator(
-    #     task_id="upload_csv_to_s3",
-    #     python_callable=upload_batch_csv_to_s3,
-    # )
+ 
 
+    # TASK 2: Silver
 
-    # run_bronze = DatabricksSubmitRunOperator(
-    #     task_id="run_bronze",
-    #     databricks_conn_id="databricks_default",
-    # )
-
+    run_silver = DatabricksSubmitRunOperator(
+    task_id="run_silver",
+    databricks_conn_id="databricks_default",
+    json={
+        "tasks": [
+            {
+                "task_key": "silver_task",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/202251023@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/silver_layer"
+                }
+            }
+        ]
+    }
+)
     
 
-    
-    # run_bronze = DatabricksSubmitRunOperator(
-    #     task_id="run_bronze", databricks_conn_id="databricks_default",
-    #     notebook_task={"notebook_path": f"{NOTEBOOK_ROOT}/01_bronze",
-    #                    "base_parameters": {"batch_id": BATCH_ID}})
+#   TASK 3.   Run silver Data quality checks
+    run_silver = DatabricksSubmitRunOperator(
+    task_id="run_silver_data_quality",
+    databricks_conn_id="databricks_default",
+    json={
+        "tasks": [
+            {
+                "task_key": "silver_task",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/202251023@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/Silver_dataquality_version2"
+                }
+            }
+        ]
+    }
+)
 
-    # TASK 3: Silver
 
-#     run_silver = DatabricksSubmitRunOperator(
-#     task_id="run_silver",
-#     databricks_conn_id="databricks_default",
-#     json={
-#         "tasks": [
-#             {
-#                 "task_key": "silver_task",
-#                 "notebook_task": {
-#                     "notebook_path": "/Workspace/Users/abhinav66623@gmail.com/SafeCity_1/02_silver"
-#                 }
-#             }
-#         ]
-#     }
-# )
 #     # run_silver = DatabricksSubmitRunOperator(
 #     #     task_id="run_silver", databricks_conn_id="databricks_default",
 #     #     notebook_task={"notebook_path": f"{NOTEBOOK_ROOT}/02_silver"})
