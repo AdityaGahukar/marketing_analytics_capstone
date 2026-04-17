@@ -7,3 +7,4 @@ sqlparse
 pyarrow
 openai
 mistralai
+snowflake-connector-python
