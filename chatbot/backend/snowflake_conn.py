@@ -12,7 +12,8 @@ def run_query(query):
         account=os.getenv("SNOWFLAKE_ACCOUNT"), # Ensure no .snowflakecomputing.com here
         warehouse=os.getenv("SNOWFLAKE_WAREHOUSE"),
         database=os.getenv("SNOWFLAKE_DATABASE"),
-        schema=os.getenv("SNOWFLAKE_SCHEMA")
+        schema=os.getenv("SNOWFLAKE_SCHEMA"),
+        role="chatbot_readonly"
     )
     
     try:

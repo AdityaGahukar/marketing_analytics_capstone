@@ -2,6 +2,7 @@ import os
 import re
 import requests
 from dotenv import load_dotenv
+from knowledgebase import data_dict,query_patterns,business_rules,build_system_prompt
 
 # 🔐 Load env
 load_dotenv()
@@ -35,27 +36,29 @@ def generate_sql(user_input: str) -> str:
    """
   
    # 🛠️ UPDATED SYSTEM PROMPT WITH YOUR SNOWFLAKE SCHEMA
-   system_prompt = """
-   You are an expert Snowflake SQL generator.
+#    system_prompt = """
+#    You are an expert Snowflake SQL generator.
    
-   CRITICAL: You MUST use the table name: FACT_CAMPAIGN_PERFORMANCE
+#    CRITICAL: You MUST use the table name: FACT_CAMPAIGN_PERFORMANCE
    
-   TABLE SCHEMA:
-   - FACT_CAMPAIGN_PERFORMANCE:
-     - campaign_id (STRING)
-     - date (DATE)
-     - channel_used (STRING)
-     - total_clicks (INTEGER)
-     - total_cost (FLOAT)
-     - avg_roi (FLOAT)
+#    TABLE SCHEMA:
+#    - FACT_CAMPAIGN_PERFORMANCE:
+#      - campaign_id (STRING)
+#      - date (DATE)
+#      - channel_used (STRING)
+#      - total_clicks (INTEGER)
+#      - total_cost (FLOAT)
+#      - avg_roi (FLOAT)
 
-   STRICT RULES:
-   - Only SELECT queries allowed.
-   - Use uppercase for table and column names.
-   - Always include LIMIT 100.
-   - Use SUM or AVG for metrics like total_clicks or avg_roi when grouping.
-   - Return ONLY the SQL query text. No markdown, no explanations.
-   """
+#    STRICT RULES:
+#    - Only SELECT queries allowed.
+#    - Use uppercase for table and column names.
+#    - Always include LIMIT 100.
+#    - Use SUM or AVG for metrics like total_clicks or avg_roi when grouping.
+#    - Return ONLY the SQL query text. No markdown, no explanations.
+#    """
+
+   system_prompt=build_system_prompt(data_dict,business_rules,query_patterns)
 
    url = "https://openrouter.ai/api/v1/chat/completions"
    headers = {
