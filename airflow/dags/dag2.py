@@ -102,6 +102,38 @@ with DAG(
         ]
     }
 )
+    
+    run_gold= DatabricksSubmitRunOperator(
+    task_id="run_gold_layer",
+    databricks_conn_id="databricks_default",
+    json={
+        "tasks": [
+            {
+                "task_key": "gold_task",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/202251023@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/gold_layer"
+                }
+            }
+        ]
+    }
+)
+    
+    run_gold_dq= DatabricksSubmitRunOperator(
+    task_id="run_gold__data_quality_layer",
+    databricks_conn_id="databricks_default",
+    json={
+        "tasks": [
+            {
+                "task_key": "gold_quality_task",
+                "notebook_task": {
+                    "notebook_path": "/Workspace/Users/202251023@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/data_quality_check_gold_layer"
+                }
+            }
+        ]
+    }
+)
+
+
 
 
 
@@ -112,4 +144,4 @@ with DAG(
     )
 
 
-run_bronze >> run_silver >> run_silver_dq >> snowflake_step
+run_bronze >> run_silver >> run_silver_dq >> run_gold >> run_gold_dq >> snowflake_step
