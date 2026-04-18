@@ -7,7 +7,7 @@ from snowflake_conn import run_query
 
 from llm import generate_sql
 from validator import validate_sql
-from databrickconn import run_query
+# from databrickconn import run_query
 from databricks import sql
 import os
 from dotenv import load_dotenv

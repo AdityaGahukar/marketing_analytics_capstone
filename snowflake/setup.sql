@@ -204,7 +204,7 @@ SELECT * FROM dim_campaign LIMIT 10;
 
 -- VIEWS
 -- CORE ANALYTICS VIEW
-CREATE OR REPLACE VIEW vw_campaign_performance AS
+CREATE OR REPLACE TABLE vw_campaign_performance AS
 SELECT
     f.campaign_id,
     f.date,
@@ -235,7 +235,7 @@ LEFT JOIN dim_date d
     ON f.date = d.date;
 
 -- KPI SUMMARY VIEW (FOR QUICK DASHBOARD METRICS)
-CREATE OR REPLACE VIEW vw_kpi_summary AS
+CREATE OR REPLACE TABLE vw_kpi_summary AS
 SELECT
     SUM(total_clicks) AS total_clicks,
     SUM(total_impressions) AS total_impressions,
@@ -252,7 +252,7 @@ SELECT
 FROM fact_campaign_performance;
 
 -- DAILY TREND VIEW
-CREATE OR REPLACE VIEW vw_daily_trends AS
+CREATE OR REPLACE TABLE vw_daily_trends AS
 SELECT
     date,
     SUM(total_clicks) AS total_clicks,
@@ -273,7 +273,7 @@ GROUP BY date
 ORDER BY date;
 
 -- CHANNEL PERFORMANCE VIEW
-CREATE OR REPLACE VIEW vw_channel_performance AS
+CREATE OR REPLACE TABLE vw_channel_performance AS
 SELECT
     date,
     channel_used,
@@ -293,7 +293,7 @@ FROM fact_campaign_performance
 GROUP BY date, channel_used;
 
 -- CAMPAIGN PERFORMANCE VIEW
-CREATE OR REPLACE VIEW vw_campaign_summary AS
+CREATE OR REPLACE TABLE vw_campaign_summary AS
 SELECT
     campaign_id,
     SUM(total_clicks) AS total_clicks,
@@ -313,7 +313,7 @@ FROM fact_campaign_performance
 GROUP BY campaign_id;
 
 -- MONTHLY TRENDS VIEW
-CREATE OR REPLACE VIEW vw_monthly_trends AS
+CREATE OR REPLACE TABLE vw_monthly_trends AS
 SELECT
     d.year,
     d.month,
