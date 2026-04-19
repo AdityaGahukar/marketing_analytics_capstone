@@ -41,7 +41,7 @@ with DAG(
     tags=[PROJECT, STUDENT],
 ) as dag:
 
-    # TASK 1: Upload batch CSV from local Mac folder to S3
+    # # TASK 1: Upload batch CSV from local Mac folder to S3
     # upload_csv_to_s3 = PythonOperator(
     #     task_id="upload_csv_to_s3",
     #     python_callable=upload_batch_csv_to_s3,
@@ -79,7 +79,7 @@ with DAG(
             {
                 "task_key": "silver_task",
                 "notebook_task": {
-                    "notebook_path": "/Workspace/Users/aditya.sah@sigmoidanalytics.com/marketing_analytics_capstone/notebooks/silver_layer"
+                    "notebook_path": "/Workspace/Users/202251023@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/silver_layer"
                 }
             }
         ]
@@ -96,7 +96,7 @@ with DAG(
             {
                 "task_key": "silver_task",
                 "notebook_task": {
-                    "notebook_path": "/Workspace/Users/aditya.sah@sigmoidanalytics.com/marketing_analytics_capstone/notebooks/Silver_dataquality_version2"
+                    "notebook_path": "/Workspace/Users/202252302@iiitvadodara.ac.in/marketing_analytics_capstone/notebooks/Silver_dataquality_version2"
                 }
             }
         ]
@@ -144,4 +144,5 @@ with DAG(
     )
 
 
-run_bronze >> run_silver >> run_silver_dq >> run_gold >> run_gold_dq >> snowflake_step
+run_bronze >> run_silver >>run_silver_dq>>  run_gold >> run_gold_dq >> snowflake_step
+# run_silver_dq>>snowflake_step

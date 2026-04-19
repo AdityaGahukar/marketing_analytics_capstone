@@ -59,6 +59,7 @@ def generate_sql(user_input: str) -> str:
 #    """
 
    system_prompt=build_system_prompt(data_dict,business_rules,query_patterns)
+   system_prompt+='Please make sure dont add any comments just only gave me sql querey not other than that '
 
    url = "https://openrouter.ai/api/v1/chat/completions"
    headers = {
