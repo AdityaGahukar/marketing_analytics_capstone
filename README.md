@@ -14,7 +14,7 @@
 | TSV771 | Anshu Kashyap |
 | TSV781 | Arnav Gupta |
 
-**Programme:** AWS Batch 1 — Capstone Project, Team 1
+**Programme:** AWS Batch — Capstone Project
 
 ---
 
@@ -145,9 +145,8 @@ Six rules checked on the Fact table:
 On breach → exception raised, Airflow fails the task, Snowflake load does not run.
 
 ### Snowflake Load
-Gold Parquet files exported to `s3://marketing-analytics-capstone/gold/` then loaded via `COPY INTO`:
+Gold Parquet files exported then loaded via `COPY INTO`:
 ```sql
-TRUNCATE TABLE fact_campaign_performance;
 COPY INTO fact_campaign_performance
 FROM @marketing_stage/fact_campaign_performance/
 FILE_FORMAT = (TYPE = PARQUET)
@@ -166,7 +165,7 @@ Natural language → SQL interface on top of the Snowflake Gold layer.
 User question → LLM (OpenRouter) → SQL → Validator → Snowflake → Table + Chart
 ```
 
-- **LLM:** OpenRouter (`elephant-alpha` / `gemini-2.0-flash`), temperature 0
+- **LLM:** OpenRouter (`elephant-alpha`, temperature 0)
 - **Knowledge base:** Full data dictionary, business rules, and 6 query pattern examples injected into system prompt
 - **Validator:** Allows SELECT only · requires LIMIT · blocks DROP/DELETE/INSERT/ALTER
 - **Frontend:** Streamlit — renders results as interactive table + line/bar chart
@@ -191,7 +190,7 @@ run_bronze → run_silver → run_silver_dq → run_gold → run_gold_dq → sno
 AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_REGION
 S3_BUCKET=marketing-analytics-capstone
 S3_FILE_KEY=raw/
-BATCH_SIZE=100
+BATCH_SIZE=10000
 ```
 
 **Airflow** (Astro connections)
