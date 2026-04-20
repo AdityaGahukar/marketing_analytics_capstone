@@ -35,7 +35,7 @@ Data Sources (Facebook · Instagram · YouTube · Google Ads)
          │
     FastAPI Backend  ──→  Airflow DAG 1 (incremental ingest)
          │
-    AWS S3 — Raw Zone  (s3://marketing-analytics-capstone/raw/)
+    AWS S3 — Raw Zone  
          │
     Airflow DAG 2 (orchestration)
          │
@@ -43,14 +43,12 @@ Data Sources (Facebook · Instagram · YouTube · Google Ads)
     │ BRONZE  │───▶│     SILVER      │───▶│  GOLD   │
     │AutoLoader│   │ Clean · DQ Flag │    │Star Schema│
     └─────────┘   └─────────────────┘    └────┬────┘
-                                              │
-                             ┌────────────────┼─────────────────┐
-                             │                                   │
-                     S3 Gold Export                        AI Chatbot
-                             │                             (InsyteAI)
-                        Snowflake
-                             │
-                      BI Dashboards
+                                               │                                   
+                                       S3 Gold Export                        
+                                               │                             
+                                          Snowflake ────   AI Chatbot(InsyteAI)
+                                               │
+                                        BI Dashboards
 ```
 
 ---
