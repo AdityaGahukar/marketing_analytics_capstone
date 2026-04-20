@@ -11,7 +11,7 @@
 |---|---|
 | TSV780 | Aditya Rajesh Gahukar |
 | TSV859 | Aditya Sah |
-| TSV771 | Anshu |
+| TSV771 | Anshu Kashyap |
 | TSV781 | Arnav Gupta |
 
 **Programme:** AWS Batch 1 — Capstone Project, Team 1
