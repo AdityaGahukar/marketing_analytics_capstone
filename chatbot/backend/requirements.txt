@@ -1,10 +1,19 @@
+# fastapi
+# uvicorn
+# databricks-sql-connector
+# python-dotenv  
+# google-generativeai
+# sqlparse
+# pyarrow
+# openai
+# mistralai
+# snowflake-connector-python
+# boto3
+
 fastapi
 uvicorn
-databricks-sql-connector
-python-dotenv  
-google-generativeai
+python-dotenv
 sqlparse
 pyarrow
-openai
-mistralai
 snowflake-connector-python
+boto3

@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+
 def run_query(query):
     # Establish connection using Snowflake-specific credentials
     ctx = snowflake.connector.connect(

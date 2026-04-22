@@ -8,7 +8,7 @@ from snowflake_conn import run_query
 from llm import generate_sql
 from validator import validate_sql
 # from databrickconn import run_query
-from databricks import sql
+# from databricks import sql
 import os
 from dotenv import load_dotenv
 
@@ -34,6 +34,7 @@ def chat(request: ChatRequest):
 
     # 🤖 1. Generate SQL (Ensure llm.py is updated with Snowflake schema)
     sql_query = generate_sql(user_input)
+    
     print(sql_query)
 
     # 🔐 2. Validate (Ensure validator.py allows FACT_CAMPAIGN_PERFORMANCE)
