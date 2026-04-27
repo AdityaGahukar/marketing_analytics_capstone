@@ -7,4 +7,4 @@ RAW_PREFIX = "raw/"
 
 OFFSET_KEY = "metadata/offset.json"
 
-BATCH_SIZE = 1000
+BATCH_SIZE = 10000

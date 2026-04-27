@@ -371,11 +371,10 @@ with col_inp:
     )
 with col_btn:
     send_clicked = st.button(
-        "Generate ➤",
-        disabled=not (user_input and user_input.strip()),
-        use_container_width=True,
-        key="send_btn",
-    )
+    "Generate ➤",
+    use_container_width=True,
+    key="send_btn",
+)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # A dedicated container just for the loader so it appears exactly where we want it!

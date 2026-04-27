@@ -1,0 +1,143 @@
+{
+    "tables":[
+
+{
+        "table": "FACT_CAMPAIGN_PERFORMANCE",
+        "schema": "GOLD",
+        "description": "Core fact table storing daily performance metrics at the campaign, channel, company, and location grain.",
+        "grain": "One row per (date, campaign_id, channel_used, company, location)",
+        "columns": [
+            {"column": "CAMPAIGN_ID",         "type": "NUMBER",    "description": "Foreign key linking to the campaign dimension."},
+            {"column": "DATE",                "type": "TIMESTAMP", "description": "Date of the performance record."},
+            {"column": "CHANNEL_USED",        "type": "STRING",    "description": "Marketing channel (e.g., Social, Search, Email)."},
+            {"column": "COMPANY",             "type": "STRING",    "description": "Company associated with the campaign."},
+            {"column": "LOCATION",            "type": "STRING",    "description": "Geographic location of the performance data."},
+            {"column": "TOTAL_CLICKS",        "type": "NUMBER",    "description": "Total number of clicks generated."},
+            {"column": "TOTAL_IMPRESSIONS",   "type": "NUMBER",    "description": "Total number of ad impressions."},
+            {"column": "TOTAL_COST",          "type": "FLOAT",     "description": "Total spend/cost for the campaign on this date."},
+            {"column": "AVG_CONVERSION_RATE", "type": "FLOAT",     "description": "Average conversion rate recorded for the day."},
+            {"column": "AVG_ROI",             "type": "FLOAT",     "description": "Average Return on Investment for the day."},
+            {"column": "AVG_CTR",             "type": "FLOAT",     "description": "Average Click-Through Rate for the day."}
+        ]
+},
+    {
+        "table": "DIM_CAMPAIGN",
+        "schema": "GOLD",
+        "description": "Dimension table storing campaign metadata.",
+        "columns": [
+            {"column": "CAMPAIGN_ID",      "type": "NUMBER", "description": "Unique identifier for the campaign."},
+            {"column": "CAMPAIGN_TYPE",    "type": "STRING", "description": "Type of the campaign (e.g., Awareness, Conversion)."},
+            {"column": "TARGET_AUDIENCE",  "type": "STRING", "description": "Description of the target demographic."},
+            {"column": "CUSTOMER_SEGMENT", "type": "STRING", "description": "Specific segment of customers targeted."}
+        ]
+    },
+    {
+        "table": "DIM_DATE",
+        "schema": "GOLD",
+        "description": "Calendar dimension table for time-based groupings.",
+        "columns": [
+            {"column": "DATE",       "type": "TIMESTAMP", "description": "Calendar date."},
+            {"column": "YEAR",       "type": "NUMBER",    "description": "Year component of the date."},
+            {"column": "MONTH",      "type": "NUMBER",    "description": "Numeric month (1-12)."},
+            {"column": "MONTH_NAME", "type": "STRING",    "description": "Name of the month (e.g., 'January')."},
+            {"column": "QUARTER",    "type": "NUMBER",    "description": "Quarter of the year (1-4)."}
+        ]
+    },
+    {
+        "table": "DIM_CHANNEL",
+        "schema": "GOLD",
+        "description": "Dimension table for marketing channels.",
+        "columns": [{"column": "CHANNEL_USED", "type": "STRING", "description": "Distinct marketing channels available."}]
+    },
+    {
+        "table": "DIM_COMPANY",
+        "schema": "GOLD",
+        "description": "Dimension table for companies.",
+        "columns": [{"column": "COMPANY", "type": "STRING", "description": "Distinct companies associated with campaigns."}]
+    },
+    {
+        "table": "DIM_LOCATION",
+        "schema": "GOLD",
+        "description": "Dimension table for target locations.",
+        "columns": [{"column": "LOCATION", "type": "STRING", "description": "Distinct geographic locations."}]
+    },
+
+ 
+    {
+        "table": "VW_KPI_SUMMARY",
+        "schema": "GOLD",
+        "description": "High-level aggregate view of all-time overall performance. Use for dashboard top-line numbers.",
+        "columns": [
+            {"column": "TOTAL_CLICKS",      "type": "NUMBER", "description": "All-time total clicks."},
+            {"column": "TOTAL_IMPRESSIONS", "type": "NUMBER", "description": "All-time total impressions."},
+            {"column": "TOTAL_COST",        "type": "FLOAT",  "description": "All-time total cost."},
+            {"column": "CTR",               "type": "FLOAT",  "description": "Overall weighted Click-Through Rate."},
+            {"column": "AVG_ROI",           "type": "FLOAT",  "description": "Overall average Return on Investment."}
+        ]
+    },
+    {
+        "table": "VW_CHANNEL_PERFORMANCE",
+        "schema": "GOLD",
+        "description": "Daily performance aggregated by marketing channel.",
+        "columns": [
+            {"column": "DATE",              "type": "TIMESTAMP", "description": "Date of the record."},
+            {"column": "CHANNEL_USED",      "type": "STRING",    "description": "Marketing channel."},
+            {"column": "TOTAL_CLICKS",      "type": "NUMBER",    "description": "Total clicks for the channel on this date."},
+            {"column": "TOTAL_IMPRESSIONS", "type": "NUMBER",    "description": "Total impressions for the channel on this date."},
+            {"column": "CTR",               "type": "FLOAT",     "description": "Weighted CTR for the channel on this date."},
+            {"column": "AVG_ROI",           "type": "FLOAT",     "description": "Average ROI for the channel on this date."}
+        ]
+    },
+    {
+        "table": "VW_CAMPAIGN_SUMMARY",
+        "schema": "GOLD",
+        "description": "All-time performance aggregated by campaign ID.",
+        "columns": [
+            {"column": "CAMPAIGN_ID",       "type": "NUMBER", "description": "Unique campaign identifier."},
+            {"column": "TOTAL_CLICKS",      "type": "NUMBER", "description": "Total clicks for this campaign."},
+            {"column": "TOTAL_IMPRESSIONS", "type": "NUMBER", "description": "Total impressions for this campaign."},
+            {"column": "TOTAL_COST",        "type": "FLOAT",  "description": "Total cost spent on this campaign."},
+            {"column": "CTR",               "type": "FLOAT",  "description": "Weighted CTR for this campaign."},
+            {"column": "AVG_ROI",           "type": "FLOAT",  "description": "Average ROI for this campaign."}
+        ]
+    },
+    {
+        "table": "VW_MONTHLY_TRENDS",
+        "schema": "GOLD",
+        "description": "Performance aggregated by year and month. Use for month-over-month trend analysis.",
+        "columns": [
+            {"column": "YEAR",              "type": "NUMBER", "description": "Year of the record."},
+            {"column": "MONTH",             "type": "NUMBER", "description": "Numeric month (1-12)."},
+            {"column": "TOTAL_CLICKS",      "type": "NUMBER", "description": "Total clicks for the month."},
+            {"column": "TOTAL_IMPRESSIONS", "type": "NUMBER", "description": "Total impressions for the month."},
+            {"column": "CTR",               "type": "FLOAT",  "description": "Weighted CTR for the month."},
+            {"column": "AVG_ROI",           "type": "FLOAT",  "description": "Average ROI for the month."}
+        ]
+    },
+    {
+        "table": "VW_CAMPAIGN_PERFORMANCE",
+        "schema": "GOLD",
+        "description": "Master flattened view combining FACT_CAMPAIGN_PERFORMANCE, DIM_CAMPAIGN, and DIM_DATE. Use when filtering by specific demographics, company, or location.",
+        "columns": [
+            {"column": "CAMPAIGN_ID",         "type": "NUMBER",    "description": "Unique identifier for the campaign."},
+            {"column": "DATE",                "type": "TIMESTAMP", "description": "Date of the performance record."},
+            {"column": "YEAR",                "type": "NUMBER",    "description": "Year of the record."},
+            {"column": "MONTH",               "type": "NUMBER",    "description": "Numeric month of the record."},
+            {"column": "MONTH_NAME",          "type": "STRING",    "description": "Name of the month."},
+            {"column": "QUARTER",             "type": "NUMBER",    "description": "Quarter of the year."},
+            {"column": "CHANNEL_USED",        "type": "STRING",    "description": "Marketing channel."},
+            {"column": "COMPANY",             "type": "STRING",    "description": "Company associated with the campaign."},
+            {"column": "LOCATION",            "type": "STRING",    "description": "Geographic location."},
+            {"column": "CAMPAIGN_TYPE",       "type": "STRING",    "description": "Type of the campaign."},
+            {"column": "TARGET_AUDIENCE",     "type": "STRING",    "description": "Target demographic."},
+            {"column": "CUSTOMER_SEGMENT",    "type": "STRING",    "description": "Specific segment of customers targeted."},
+            {"column": "TOTAL_CLICKS",        "type": "NUMBER",    "description": "Total clicks generated."},
+            {"column": "TOTAL_IMPRESSIONS",   "type": "NUMBER",    "description": "Total ad impressions."},
+            {"column": "TOTAL_COST",          "type": "FLOAT",     "description": "Total cost spent."},
+            {"column": "AVG_CONVERSION_RATE", "type": "FLOAT",     "description": "Average conversion rate."},
+            {"column": "AVG_ROI",             "type": "FLOAT",     "description": "Average Return on Investment."},
+            {"column": "AVG_CTR",             "type": "FLOAT",     "description": "Average Click-Through Rate."}
+        ]
+    }
+]
+}

@@ -12,12 +12,14 @@ from validator import validate_sql
 import os
 from dotenv import load_dotenv
 
+from sqlSecurity import run_security_pipeline, build_schema_registry
+from knowledgebase import data_dict
 load_dotenv()
 
 app = FastAPI()
 
 
-
+SCHEMA_REGISTRY = build_schema_registry(data_dict)
 
 
 # ✅ Request schema (IMPORTANT FIX)
@@ -38,7 +40,7 @@ def chat(request: ChatRequest):
     print(sql_query)
 
     # 🔐 2. Validate (Ensure validator.py allows FACT_CAMPAIGN_PERFORMANCE)
-    # is_valid, message = validate_sql(sql_query)
+    # is_valid, message = run_security_pipeline(user_input, sql_query, SCHEMA_REGISTRY)
     # if not is_valid:
     #     return {
     #         "status": "error",

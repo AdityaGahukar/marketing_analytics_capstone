@@ -1,13 +1,6 @@
 import sqlparse
 
-ALLOWED_TABLE = "gold_sales"
-ALLOWED_COLUMNS = [
-    "order_id",
-    "sales_amount",
-    "country",
-    "product_category",
-    "order_date"
-]
+
 
 
 def validate_sql(query):
@@ -30,7 +23,6 @@ def validate_sql(query):
         return False, "LIMIT is required"
 
    
-    if ALLOWED_TABLE not in query:
-        return False, "Invalid table used"
+   
 
     return True, "Valid query"

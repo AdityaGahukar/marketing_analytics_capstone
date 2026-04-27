@@ -547,42 +547,42 @@ FROM MARKETING_ANALYTICS.GOLD.DIM_CHANNEL;
 
 #     return prompt
 
-def build_system_prompt(data_dict, business_rules, query_patterns):
-    prompt = "You are a Snowflake SQL expert for a marketing analytics data warehouse.\n\n"
-    prompt += "## STRICT RULES\n"
-    for i, rule in enumerate(business_rules, 1):
-        prompt += f"{i}. {rule}\n"
+# def build_system_prompt(data_dict, business_rules, query_patterns):
+#     prompt = "You are a Snowflake SQL expert for a marketing analytics data warehouse.\n\n"
+#     prompt += "## STRICT RULES\n"
+#     for i, rule in enumerate(business_rules, 1):
+#         prompt += f"{i}. {rule}\n"
 
-    prompt += "\n## DATA DICTIONARY\n"
-    for table in data_dict:
-        prompt += f"\n### TABLE: {table.get('schema', 'GOLD')}.{table.get('table')}\n"
-        prompt += f"Description: {table.get('description', '')}\n"
+#     prompt += "\n## DATA DICTIONARY\n"
+#     for table in data_dict:
+#         prompt += f"\n### TABLE: {table.get('schema', 'GOLD')}.{table.get('table')}\n"
+#         prompt += f"Description: {table.get('description', '')}\n"
         
-        # Safely get 'grain' only if it exists
-        if table.get('grain'):
-            prompt += f"Grain: {table.get('grain')}\n"
+#         # Safely get 'grain' only if it exists
+#         if table.get('grain'):
+#             prompt += f"Grain: {table.get('grain')}\n"
             
-        prompt += "Columns:\n"
-        for col in table.get("columns", []):
-            # Safely get 'fk' and 'nullable' using .get() so it doesn't crash if missing
-            fk_val = col.get("fk")
-            fk_note = f" | FK → {fk_val}" if fk_val else ""
+#         prompt += "Columns:\n"
+#         for col in table.get("columns", []):
+#             # Safely get 'fk' and 'nullable' using .get() so it doesn't crash if missing
+#             fk_val = col.get("fk")
+#             fk_note = f" | FK → {fk_val}" if fk_val else ""
             
-            null_val = col.get("nullable")
-            null_note = ""
-            if null_val is not None:
-                null_note = " | NULLABLE" if null_val else " | NOT NULL"
+#             null_val = col.get("nullable")
+#             null_note = ""
+#             if null_val is not None:
+#                 null_note = " | NULLABLE" if null_val else " | NOT NULL"
                 
-            prompt += f"  - {col.get('column')} ({col.get('type')}){fk_note}{null_note}: {col.get('description', '')}\n"
+#             prompt += f"  - {col.get('column')} ({col.get('type')}){fk_note}{null_note}: {col.get('description', '')}\n"
             
-        # Safely handle calculated metrics if we ever add them back
-        if "calculated_metrics" in table:
-            prompt += "Calculated Metrics (NOT stored columns):\n"
-            for m in table["calculated_metrics"]:
-                prompt += f"  - {m['metric']} = {m['formula']}  → {m['description']}\n"
+#         # Safely handle calculated metrics if we ever add them back
+#         if "calculated_metrics" in table:
+#             prompt += "Calculated Metrics (NOT stored columns):\n"
+#             for m in table["calculated_metrics"]:
+#                 prompt += f"  - {m['metric']} = {m['formula']}  → {m['description']}\n"
 
-    prompt += "\n## EXAMPLE QUERY PATTERNS\n"
-    for qp in query_patterns:
-        prompt += f"\nUser asks: \"{qp['user_ask']}\"\nSQL:\n{qp['sql']}\n"
+#     prompt += "\n## EXAMPLE QUERY PATTERNS\n"
+#     for qp in query_patterns:
+#         prompt += f"\nUser asks: \"{qp['user_ask']}\"\nSQL:\n{qp['sql']}\n"
 
-    return prompt
+#     return prompt

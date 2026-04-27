@@ -140,9 +140,13 @@ with DAG(
     snowflake_step = SQLExecuteQueryOperator(
         task_id="snowflake_transformation",
         conn_id="snowflake_default",
-        sql="sql/snowflake_transformations.sql"
+        sql="sql/snowflake_t2.sql"
     )
 
 
 run_bronze >> run_silver >>run_silver_dq>>  run_gold >> run_gold_dq >> snowflake_step
+
 # run_silver_dq>>snowflake_step
+
+
+# snowflake_step
